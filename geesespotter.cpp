@@ -11,19 +11,34 @@ char* createBoard(std::size_t xdim, std::size_t ydim){
 }
 
 void computeNeighborsHelper(char* board, std::size_t xdim, std::size_t ydim, std::size_t xloc, std::size_t yloc) {
-	int i = 0;
-	int j = 0;
 	int counter = 0; 
 
 	if ((board[yloc * xdim + xloc] & valueMask()) == 0x09) {
 		return; 
 	}
-	for (i = -1; i < 2; ++i) {
-		for (j = -1; j < 2; ++j) {
-			if ((yloc + j) >= 0 && (yloc + j) < ydim && (xloc + i) >= 0 && (xloc + i) < xdim) {
-				if ((board[(yloc + j) * xdim + xloc + i] & valueMask()) == 0x09) {
-					++counter;
-				}
+
+	std::size_t start_x = xloc;
+	std::size_t end_x = xloc;
+	std::size_t start_y = yloc;
+	std::size_t end_y = yloc;
+
+	if (xloc > 0) {
+		start_x = xloc - 1;
+	}
+	if (xloc + 1 < xdim) {
+		end_x = xloc + 1;
+	}
+	if (yloc > 0) {
+		start_y = yloc - 1;
+	}
+	if (yloc + 1 < ydim) {
+		end_y = yloc + 1;
+	}
+
+	for (std::size_t y = start_y; y <= end_y; ++y) {
+		for (std::size_t x = start_x; x <= end_x; ++x) {
+			if ((board[y * xdim + x] & valueMask()) == 0x09) {
+				++counter;
 			}
 		}
 	}
@@ -32,8 +47,7 @@ void computeNeighborsHelper(char* board, std::size_t xdim, std::size_t ydim, std
 }
 
 void computeNeighbors(char* board, std::size_t xdim, std::size_t ydim) {
-	int index = 0;
-	for (index = 0; index < xdim * ydim; ++index) {
+	for (std::size_t index = 0; index < xdim * ydim; ++index) {
 		computeNeighborsHelper(board, xdim, ydim, index % xdim, index / xdim);
 	}
 	return; 
@@ -90,24 +104,29 @@ int reveal(char* board, std::size_t xdim, std::size_t ydim, std::size_t xloc, st
 		board[yloc * xdim + xloc] &= valueMask();
 
 		if ((board[yloc * xdim + xloc] & valueMask()) == 0x00) {
-			int edgex = xloc;
-			int edgey = yloc; 
-			if (xloc == 0x00) {
-				edgex = edgex+ 1;
+			std::size_t start_x = xloc;
+			std::size_t end_x = xloc;
+			std::size_t start_y = yloc;
+			std::size_t end_y = yloc;
+
+			if (xloc > 0) {
+				start_x = xloc - 1;
 			}
-			if (yloc == 0x00) {
-				edgey = edgey + 1;
+			if (xloc + 1 < xdim) {
+				end_x = xloc + 1;
 			}
-			for (int rev_y = edgey - 1; rev_y <= yloc + 1; ++rev_y) {
-				for (int rev_x = edgex - 1; rev_x <= xloc + 1; ++rev_x) {
-					//check if still on board
-					if (rev_x < xdim && rev_y < ydim ) {
-						//from the statement to reveal the space
-							//valuemask forces 4 left bits off-- > goes to zero
-						if ((board[rev_y * xdim + rev_x] & markedBit()) != markedBit()) {
-							board[rev_y * xdim + rev_x] &= valueMask();
-						}
-					}
+			if (yloc > 0) {
+				start_y = yloc - 1;
+			}
+			if (yloc + 1 < ydim) {
+				end_y = yloc + 1;
+			}
+
+			for (std::size_t rev_y = start_y; rev_y <= end_y; ++rev_y) {
+				for (std::size_t rev_x = start_x; rev_x <= end_x; ++rev_x) {
+					if ((board[rev_y * xdim + rev_x] & markedBit()) != markedBit()) {
+						board[rev_y * xdim + rev_x] &= valueMask();
+					}				
 				}
 			}
 		}
@@ -121,6 +140,10 @@ int reveal(char* board, std::size_t xdim, std::size_t ydim, std::size_t xloc, st
 int mark(char* board, std::size_t xdim, std::size_t ydim, std::size_t xloc, std::size_t yloc) { 
 
 
+
+	if (xloc >= xdim || yloc >= ydim) {
+		return 1;
+	}
 
 	if ((board[yloc * xdim + xloc] & valueMask()) == board[yloc * xdim + xloc]) {
 		return 2;
@@ -136,13 +159,27 @@ int mark(char* board, std::size_t xdim, std::size_t ydim, std::size_t xloc, std:
 }
 
 bool isGameWon(char* board, std::size_t xdim, std::size_t ydim) {
-	unsigned int i = 0;
-	for ( i = 0; i < xdim * ydim; ++i) {
-		if ((board[i] & hiddenBit()) == hiddenBit()) {
-			if ((board[i] & valueMask()) != 0x09) {
-				return false; 
-			}
+	bool allSafeCellsRevealed = true;
+	bool allGeeseMarked = true;
+	bool hasGoose = false;
+
+	for (std::size_t i = 0; i < xdim * ydim; ++i) {
+		bool isHidden = (board[i] & hiddenBit()) == hiddenBit();
+		bool isMarked = (board[i] & markedBit()) == markedBit();
+		bool isGoose = (board[i] & valueMask()) == 0x09;
+
+		if (isGoose) {
+			hasGoose = true;
+		}
+
+		if (isHidden && !isGoose) {
+			allSafeCellsRevealed = false;
+		}
+
+		if ((isGoose && !isMarked) || (!isGoose && isMarked)) {
+			allGeeseMarked = false;
 		}
 	}
-	return true;		
+
+	return allSafeCellsRevealed || (hasGoose && allGeeseMarked);		
 }

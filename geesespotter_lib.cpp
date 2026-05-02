@@ -70,23 +70,39 @@ bool game()
 void startGame(char * & board, std::size_t & xdim, std::size_t & ydim, unsigned int & numgeese)
 {
   std::cout << "Welcome to GeeseSpotter!" << std::endl;
-  do {
-    std::cout << "Please enter the x dimension (max " << xdim_max() << "): ";
-    std::cin >> xdim;
-  } while(xdim < 1 || xdim > xdim_max());
-  do {
-    std::cout << "Please enter the y dimension (max " << ydim_max() << "): ";
-    std::cin >> ydim;
-  } while(ydim < 1 || ydim > ydim_max());
-
-  std::cout << "Please enter the number of geese: ";
-  std::cin >> numgeese;
-  while (numgeese > xdim * ydim)
+  std::cout << "Set the board size and number of geese to begin." << std::endl;
+  std::cout << "During the game, use S to show, M to mark, R to restart, and Q to quit." << std::endl;
+  do
   {
-    std::cout << "That's too many geese!" << std::endl;
-    std::cout << "Please enter the number of geese: ";
-    std::cin >> numgeese;
+    do {
+      std::cout << "Please enter the x dimension (2-" << xdim_max() << "): ";
+      xdim = readSizeT();
+      if (xdim < 2 || xdim > xdim_max())
+      {
+        std::cout << "Number entered is invalid." << std::endl;
+      }
+    } while(xdim < 2 || xdim > xdim_max());
+    do {
+      std::cout << "Please enter the y dimension (2-" << ydim_max() << "): ";
+      ydim = readSizeT();
+      if (ydim < 2 || ydim > ydim_max())
+      {
+        std::cout << "Number entered is invalid." << std::endl;
+      }
+    } while(ydim < 2 || ydim > ydim_max());
+  } while (xdim * ydim < 4);
+
+  std::size_t maxGeese {xdim * ydim - 1};
+  std::size_t geeseInput {0};
+  std::cout << "Please enter the number of geese (1-" << maxGeese << "): ";
+  geeseInput = readSizeT();
+  while (geeseInput < 1 || geeseInput > maxGeese)
+  {
+    std::cout << "Number entered is invalid." << std::endl;
+    std::cout << "Please enter the number of geese (1-" << maxGeese << "): ";
+    geeseInput = readSizeT();
   }
+  numgeese = geeseInput;
 
   cleanBoard(board);
   board = createBoard(xdim, ydim);
@@ -100,7 +116,10 @@ char getAction()
   char action {0};
 
   std::cout << "Please enter the action ([S]how, [M]ark, [R]estart, [Q]uit): ";
-  std::cin >> action;
+  if (!(std::cin >> action))
+  {
+    return 'Q';
+  }
 
   if (islower(action))
     action = toupper(action);
@@ -113,9 +132,9 @@ void actionShow(char * & board, std::size_t & xdim, std::size_t & ydim, unsigned
   std::size_t reveal_x {0};
   std::size_t reveal_y {0};
   std::cout << "Please enter the x location to show: ";
-  std::cin >> reveal_x;
+  reveal_x = readSizeT();
   std::cout << "Please enter the y location to show: ";
-  std::cin >> reveal_y;
+  reveal_y = readSizeT();
 
   if (reveal_x >= xdim || reveal_y >= ydim)
   {
@@ -140,9 +159,9 @@ void actionMark(char * board, std::size_t xdim, std::size_t ydim)
   std::size_t mark_x {0};
   std::size_t mark_y {0};
   std::cout << "Please enter the x location to mark: ";
-  std::cin >> mark_x;
+  mark_x = readSizeT();
   std::cout << "Please enter the y location to mark: ";
-  std::cin >> mark_y;
+  mark_y = readSizeT();
 
   if (mark_x >= xdim || mark_y >= ydim)
   {
@@ -156,7 +175,23 @@ void actionMark(char * board, std::size_t xdim, std::size_t ydim)
 
 std::size_t readSizeT()
 {
-  return 0;
+  std::size_t value {0};
+
+  while (!(std::cin >> value))
+  {
+    if (std::cin.eof())
+    {
+      std::cout << std::endl << "Input ended. Exiting game." << std::endl;
+      std::exit(0);
+    }
+
+    std::cout << "Number entered is invalid." << std::endl;
+    std::cout << "Please enter a number: ";
+    std::cin.clear();
+    std::cin.ignore(10000, '\n');
+  }
+
+  return value;
 }
 
 std::size_t xdim_max()
@@ -166,7 +201,7 @@ std::size_t xdim_max()
 
 std::size_t ydim_max()
 {
-  return 20;
+  return 60;
 }
 
 char markedBit()

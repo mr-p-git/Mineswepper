@@ -1,0 +1,42 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build GeeseSpotter GUI",
+      "type": "shell",
+      "command": "g++",
+      "args": [
+        "-g",
+        "geesespotter_gui.cpp",
+        "geesespotter.cpp",
+        "-lgdi32",
+        "-mwindows",
+        "-o",
+        "geesespotter_gui.exe"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": [
+        "$gcc"
+      ]
+    },
+    {
+      "label": "Build GeeseSpotter Console",
+      "type": "shell",
+      "command": "g++",
+      "args": [
+        "-g",
+        "geesespotter.cpp",
+        "geesespotter_lib.cpp",
+        "-o",
+        "geesespotter.exe"
+      ],
+      "group": "build",
+      "problemMatcher": [
+        "$gcc"
+      ]
+    }
+  ]
+}

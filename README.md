@@ -9,6 +9,18 @@ The project includes two ways to play:
 - **GUI version:** a clickable Windows interface with input boxes, mouse controls, scrollbars for large boards, and visual win/loss feedback
 - **Terminal version:** the original console version with typed commands and coordinates
 
+## Technical Highlights
+
+- C++ fundamentals
+- Pointer-based dynamic arrays
+- Bit masking and flag management
+- Console input/output
+- Basic Windows GUI programming
+- Game loop design
+- Boundary checking in a 2D grid
+- Procedural decomposition
+- Manual resource cleanup
+
 ## Quick Start
 
 If the executables are already included in the project folder, run one of these from Windows PowerShell or Command Prompt.
@@ -83,36 +95,36 @@ The terminal version asks for the board width, board height, and number of geese
 
 Available actions:
 
-| Action | Description |
-| --- | --- |
-| `S` | Show/reveal a cell |
-| `M` | Mark or unmark a suspected goose cell |
-| `R` | Restart the game |
-| `Q` | Quit |
+| Action | Description                           |
+| ------ | ------------------------------------- |
+| `S`    | Show/reveal a cell                    |
+| `M`    | Mark or unmark a suspected goose cell |
+| `R`    | Restart the game                      |
+| `Q`    | Quit                                  |
 
 Coordinates are zero-based. On a `5 x 4` board, valid `x` values are `0` through `4`, and valid `y` values are `0` through `3`.
 
 Terminal board symbols:
 
-| Symbol | Meaning |
-| --- | --- |
-| `*` | Hidden cell |
-| `M` | Marked cell |
-| `0`-`8` | Revealed safe cell showing adjacent geese |
-| `9` | Goose cell, shown after a goose is disturbed or the board is revealed |
+| Symbol  | Meaning                                                               |
+| ------- | --------------------------------------------------------------------- |
+| `*`     | Hidden cell                                                           |
+| `M`     | Marked cell                                                           |
+| `0`-`8` | Revealed safe cell showing adjacent geese                             |
+| `9`     | Goose cell, shown after a goose is disturbed or the board is revealed |
 
 ## File Structure
 
-| File | Purpose |
-| --- | --- |
-| `geesespotter.cpp` | Core board operations: allocation, neighbor computation, display, reveal, mark, win checking, and cleanup |
-| `geesespotter.h` | Function declarations for the core board operations |
-| `geesespotter_lib.cpp` | Terminal game loop, user prompts, random goose placement, and typed action handlers |
-| `geesespotter_lib.h` | Shared declarations for the terminal version |
-| `geesespotter_gui.cpp` | Windows GUI version with clickable cells and visual feedback |
-| `geesespotter.exe` | Built terminal executable |
-| `geesespotter_gui.exe` | Built GUI executable |
-| `.vscode/` | VS Code build and debug configuration for both play modes |
+| File                   | Purpose                                                                                                   |
+| ---------------------- | --------------------------------------------------------------------------------------------------------- |
+| `geesespotter.cpp`     | Core board operations: allocation, neighbor computation, display, reveal, mark, win checking, and cleanup |
+| `geesespotter.h`       | Function declarations for the core board operations                                                       |
+| `geesespotter_lib.cpp` | Terminal game loop, user prompts, random goose placement, and typed action handlers                       |
+| `geesespotter_lib.h`   | Shared declarations for the terminal version                                                              |
+| `geesespotter_gui.cpp` | Windows GUI version with clickable cells and visual feedback                                              |
+| `geesespotter.exe`     | Built terminal executable                                                                                 |
+| `geesespotter_gui.exe` | Built GUI executable                                                                                      |
+| `.vscode/`             | VS Code build and debug configuration for both play modes                                                 |
 
 ## Technical Highlights
 
@@ -126,15 +138,3 @@ Terminal board symbols:
 - Handles invalid setup values before starting a game
 - Prevents marked cells from being revealed and revealed cells from being marked
 - Adds a Win32 GUI layer without replacing the original terminal version
-
-## Skills Demonstrated
-
-- C++ fundamentals
-- Pointer-based dynamic arrays
-- Bit masking and flag management
-- Console input/output
-- Basic Windows GUI programming
-- Game loop design
-- Boundary checking in a 2D grid
-- Procedural decomposition
-- Manual resource cleanup
